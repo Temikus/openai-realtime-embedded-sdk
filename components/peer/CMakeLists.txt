@@ -1,4 +1,6 @@
 set(PEER_PROJECT_PATH "../../deps/libpeer")
+
+# Include all source files - sctp.c has internal CONFIG_USE_USRSCTP guards
 file(GLOB CODES "${PEER_PROJECT_PATH}/src/*.c")
 
 idf_component_register(
@@ -7,20 +9,20 @@ idf_component_register(
   REQUIRES mbedtls srtp json esp_netif
 )
 
-# Disable building of usrsctp
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/libpeer/src/config.h INPUT_CONTENT)
-string(REPLACE "#define HAVE_USRSCTP" "" MODIFIED_CONTENT ${INPUT_CONTENT})
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/libpeer/src/config.h ${MODIFIED_CONTENT})
-
-# Disable KeepAlives
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/libpeer/src/config.h INPUT_CONTENT)
-string(REPLACE "#define KEEPALIVE_CONNCHECK 10000" "#define KEEPALIVE_CONNCHECK 0" MODIFIED_CONTENT ${INPUT_CONTENT})
-file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/../../deps/libpeer/src/config.h ${MODIFIED_CONTENT})
-
-
 if(NOT IDF_TARGET STREQUAL linux)
   add_definitions("-DESP32")
+  # Use LWIP for network operations instead of Linux ifaddrs
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE CONFIG_USE_LWIP=1)
+  # Set byte order for correct RTP header handling (required by libpeer 9135cde)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE __BYTE_ORDER=__LITTLE_ENDIAN)
+  # Set buffer sizes as per libpeer defaults
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE CONFIG_AUDIO_BUFFER_SIZE=8096)
+  target_compile_definitions(${COMPONENT_LIB} PRIVATE CONFIG_DATA_BUFFER_SIZE=102400)
 endif()
+
+# Disable USRSCTP (not available on ESP32)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE CONFIG_USE_USRSCTP=0)
+
 add_definitions("-DHTTP_DO_NOT_USE_CUSTOM_CONFIG -DMQTT_DO_NOT_USE_CUSTOM_CONFIG -DDISABLE_PEER_SIGNALING=true")
 
 # Suppress warnings treated as errors in libpeer
