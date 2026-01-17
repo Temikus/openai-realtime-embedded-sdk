@@ -1,48 +1,71 @@
-# Open RealtimeAPI Embedded SDK
+# OpenAI Realtime Embedded SDK
 
-# Table of Contents
+## Table of Contents
 
-- [Docs](#docs)
+- [Platform Support](#platform-support)
 - [Installation](#installation)
 - [Usage](#usage)
 
-## Platform/Device Support
+## Platform Support
 
-This SDK has been developed tested on a `esp32s3` and `linux`. You don't need any physical hardware
-to run this SDK. You can use it from Linux directly.
+This SDK supports the following hardware:
 
-To use it on hardware purchase either of these microcontrollers. Others may work, but this is what
-has been developed against.
+**Primary Target (Default):**
+* [M5Stack AtomS3R](https://shop.m5stack.com/products/atoms3r-dev-kit) with [Atomic Echo Base](https://shop.m5stack.com/products/atomic-echo-base)
 
+**Also Supported:**
 * [Freenove ESP32-S3-WROOM](https://www.amazon.com/gp/product/B0BMQ8F7FN)
 * [Sonatino - ESP32-S3 Audio Development Board](https://www.amazon.com/gp/product/B0BVY8RJNP)
 
-You can get a ESP32S3 for much less money on eBay/AliExpress.
+You can get ESP32-S3 boards for less on eBay/AliExpress.
 
 ## Installation
 
-`protoc` must be in your path with `protobufc` installed.
+### Prerequisites
 
-Call `set-target` with the platform you are targetting. Today only `linux` and `esp32s3` are supported.
-* `idf.py set-target esp32s3`
+1. Install [PlatformIO](https://platformio.org/install)
+2. Initialize git submodules:
+   ```bash
+   git submodule update --init --recursive
+   ```
 
-Configure device specific settings. None needed at this time
-* `idf.py menuconfig`
+### Environment Variables
 
-Set your Wifi SSID + Password as env variables
-* `export WIFI_SSID=foo`
-* `export WIFI_PASSWORD=bar`
-* `export OPENAI_API_KEY=bing`
+Set your credentials as environment variables:
+```bash
+export WIFI_SSID="your_wifi_ssid"
+export WIFI_PASSWORD="your_wifi_password"
+export OPENAI_API_KEY="sk-your-api-key"
+```
 
-Build
-* `idf.py build`
+### Build
 
-If you built for `esp32s3` run the following to flash to the device
-* `sudo -E idf.py flash`
+**For M5Stack AtomS3R (default):**
+```bash
+pio run -e m5stack-atoms3r
+```
 
-If you built for `linux` you can run the binary directly
-* `./build/src.elf`
+**For generic ESP32-S3:**
+```bash
+pio run -e esp32s3
+```
 
-See [build.yaml](.github/workflows/build.yaml) for a Docker command to do this all in one step.
+### Flash
+
+```bash
+pio run -e m5stack-atoms3r -t upload
+```
+
+### Monitor
+
+```bash
+pio device monitor
+```
+
+### All-in-one (build, flash, monitor)
+
+```bash
+pio run -e m5stack-atoms3r -t upload -t monitor
+```
 
 ## Usage

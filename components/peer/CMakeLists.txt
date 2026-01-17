@@ -22,3 +22,6 @@ if(NOT IDF_TARGET STREQUAL linux)
   add_definitions("-DESP32")
 endif()
 add_definitions("-DHTTP_DO_NOT_USE_CUSTOM_CONFIG -DMQTT_DO_NOT_USE_CUSTOM_CONFIG -DDISABLE_PEER_SIGNALING=true")
+
+# Suppress warnings treated as errors in libpeer
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-restrict -Wno-unused-function)
