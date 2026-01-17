@@ -6,7 +6,7 @@
 	url = https://github.com/sean-der/libpeer
 [submodule "components/esp-libopus"]
 	path = components/esp-libopus
-	url = https://github.com/XasWorks/esp-libopus.git
+	url = git@github.com:Temikus/esp-libopus.git
 [submodule "components/esp-protocols"]
 	path = components/esp-protocols
 	url = https://github.com/espressif/esp-protocols.git
