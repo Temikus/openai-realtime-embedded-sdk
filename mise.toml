@@ -1,0 +1,33 @@
+# mise configuration for OpenAI Realtime Embedded SDK
+# Build tasks that fetch credentials from 1Password and macOS Keychain
+
+[tasks.build]
+description = "Build firmware for M5Stack AtomS3R"
+run = """
+export WIFI_SSID=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "network_name") | .value')
+export WIFI_PASSWORD=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "wireless_password") | .value')
+export OPENAI_API_KEY=$(op item get "OpenAI - M5 demo" --fields credential --format json | jq -r .value)
+pio run -e m5stack-atoms3r
+"""
+
+[tasks.flash]
+description = "Build and flash firmware to M5Stack AtomS3R"
+run = """
+export WIFI_SSID=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "network_name") | .value')
+export WIFI_PASSWORD=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "wireless_password") | .value')
+export OPENAI_API_KEY=$(op item get "OpenAI - M5 demo" --fields credential --format json | jq -r .value)
+pio run -e m5stack-atoms3r -t upload
+"""
+
+[tasks.monitor]
+description = "Monitor serial output"
+run = "pio device monitor"
+
+[tasks.upload]
+description = "Build, flash, and monitor"
+run = """
+export WIFI_SSID=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "network_name") | .value')
+export WIFI_PASSWORD=$(op item get "IoT WiFi" --format json | jq '.fields[] | select(.id == "wireless_password") | .value')
+export OPENAI_API_KEY=$(op item get "OpenAI - M5 demo" --fields credential --format json | jq -r .value)
+pio run -e m5stack-atoms3r -t upload -t monitor
+"""
